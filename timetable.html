@@ -1,0 +1,84 @@
+<div data-bb-type="screen" data-bb-effect="slide-left">
+	<div id="backTitleBar" data-bb-type="title" data-bb-caption="My TimeTable" data-bb-back-caption="Back" ></div>
+    
+    <div data-role="page" id="Alltimetable">
+        <ul data-bb-type="image-list" id="timetableList"></ul>
+     
+    </div>
+    
+ 	<div data-role="page" id="Addtimetable" hidden="">
+			<div data-bb-type="label-control-horizontal-row">
+            
+ 				Course Name :<input type="text" name="co" id="con" />
+                	Classroom Number:<input type="text" name="cla" id="clan" />
+                	
+                    <select id="week">
+                    	<option value="1">Mon</option>
+                        <option value="2">Tue</option>
+                        <option value="3">Wed</option>
+                        <option value="4">Thur</option>
+                        <option value="5">Fri</option>
+                        <option value="6">Sat</option>
+                        <option value="0">Sun</option>
+                    </select>
+                    
+                    <select id="time">
+                    	<option value="8">8:00</option>
+                        <option value="9">9:00</option>
+                        <option value="10">10:00</option>
+                        <option value="11">11:00</option>
+                        <option value="12">12:00</option>
+                        <option value="13">13:00</option>
+                        <option value="14">14:00</option>
+                    </select>
+                    
+                    <select id="hour">
+                    	<option value="1">1h</option>
+                        <option value="2">2h</option>
+                        <option value="3">3h</option>
+                        <option value="4">4h</option>
+                    </select>
+                    
+                     <div id="swi" data-bb-type="toggle" data-bb-checked="true" data-bb-on="Yes" data-bb-off="No" onchange="doSomething(this)"></div>
+                     
+                     <fieldset>
+                     	<legend>REMINDER</legend>
+                             <select id="reminder">
+                                <option value="5">5min</option>
+                                <option value="10">10min</option>
+                                <option value="15">15minmin</option>
+                                <option value="20">20min</option>
+                            </select>
+                    
+                    <div id="inswi" data-bb-type="toggle" data-bb-checked="true" data-bb-on="Yes" data-bb-off="No" onchange="doSomething(this)"></div>
+						</fieldset>
+                     
+                    <div data-bb-type="button" onclick="doSaveBBTT();">Save To Calendar</div>
+       		</div>
+	</div>
+    
+    
+    
+    
+   
+    <div data-bb-type="action-bar">
+        <div data-bb-type="action" data-bb-style="tab" data-bb-selected="true" data-bb-img="bb10/images/actionBar/cog_dark_theme.png" onclick="showTabt('Alltimetable')">View All</div>
+		<div data-bb-type="action" data-bb-style="tab" data-bb-img="bb10/images/actionBar/cog_dark_theme.png" data-bb-visible="true" onclick="showTabt('Addtimetable')">Edit/Add</div>
+	</div>
+</div>
+
+
+<script>
+	function showTabt(id) {
+	if (id == 'Alltimetable') {
+		document.getElementById('Alltimetable').style.display = 'inline';
+		document.getElementById('Addtimetable').style.display = 'none';
+		document.getElementById('backTitleBar').setCaption("View All");
+		
+		} else if (id == 'Addtimetable') {
+		document.getElementById('Addtimetable').style.display = 'inline';
+		document.getElementById('Alltimetable').style.display = 'none';
+		document.getElementById('backTitleBar').setCaption("Edit/Add");
+	} 
+}
+</script>

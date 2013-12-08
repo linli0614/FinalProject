@@ -1,0 +1,815 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Contact</title>
+<link  rel="stylesheet" type="text/css" href="cs/bbui.css"></link>
+<link  rel="stylesheet" type="text/css" href="cs/style.css"></link>
+
+	<script type="text/javascript" src="js/bbui.js"></script>
+	<script type="text/javascript" src="local:///chrome/webworks.js"></script>
+    <script type="text/javascript" src='jquery-1.9.1.min.js'></script>
+    <script src="https://maps.googleapis.com/maps/api/js?sensor=true&libraries=places"></script>
+    <style>
+	#main{
+		
+	background:#000;	
+	}
+	
+	</style>
+	<script type="text/javascript">
+	
+		  var webworksreadyFired = false;
+		  blackberry.io.sandbox = false;
+		  
+		window.addEventListener('load',function() {
+              document.addEventListener('webworksready', function(e) {
+                  bb.init({
+					  
+					  ondomready: function(element, id, params) {
+                                      if (id === 'google') {
+                                        initGoogleMaps();
+                                      }
+                                    },
+					  
+					  
+					  onscreenready: function(element, id, params){
+						  
+						  if(id == 'M6'){
+							  dataGet();
+							  
+							}
+						 
+						  	if (id == 'timetable'){
+								selectTimetableFromBB();  
+							 }  
+							 
+							if (id == 'contacts'){
+								  
+								selectContactsFromBB();  
+							 }
+							 
+							 if(id == 'detailPage'){
+								
+								 
+								 var div = document.createElement('div');
+								 div.innerHTML = "First Name:";
+								 element.getElementById('detail').appendChild(div);
+								 
+								 var div = document.createElement('div');
+								 div.innerHTML = firstName;
+								 element.getElementById('detail').appendChild(div);
+								 
+								 div = document.createElement('div');
+								 div.innerHTML = "Last Name:";
+								 element.getElementById('detail').appendChild(div);
+								 
+								 div = document.createElement('div');
+								 div.innerHTML = lastName;
+								 element.getElementById('detail').appendChild(div);
+								 if (workPhone!=" "	){
+									 
+									 div = document.createElement('div');
+									 div.innerHTML = "Work Phone:";
+									 element.getElementById('detail').appendChild(div);
+									 
+									 div = document.createElement('div');
+									 div.innerHTML = workPhone;
+									 element.getElementById('detail').appendChild(div);
+								 }
+								 div = document.createElement('div');
+								 div.innerHTML = "Home Phone:";
+								 element.getElementById('detail').appendChild(div);
+								 
+								 div = document.createElement('div');
+								 div.innerHTML = homePhone;
+								 element.getElementById('detail').appendChild(div);
+								 
+								 div = document.createElement('div');
+								 div.innerHTML = "Work Email:";
+								 element.getElementById('detail').appendChild(div);
+								 
+								 div = document.createElement('div');
+								 div.innerHTML = workEmail;
+								 element.getElementById('detail').appendChild(div);
+								 
+								 div = document.createElement('div');
+								 div.innerHTML = "Home Email:";
+								 element.getElementById('detail').appendChild(div);
+								 
+								 div = document.createElement('div');
+								 div.innerHTML = homeEmail;
+								 element.getElementById('detail').appendChild(div);
+								 
+								 div = document.createElement('div');
+								 div.innerHTML = "How We Met:";
+								 element.getElementById('detail').appendChild(div);
+								 
+								 div = document.createElement('div');
+								 div.innerHTML = Desc;
+								 element.getElementById('detail').appendChild(div);
+								 
+								 element.getElementById('img').src = 'file://' + currentImg;
+								 
+								 
+								 
+								 
+								 
+							} 
+				}
+				  
+				  });
+                  // Open our first screen
+				  startApp();
+	//			  bb.pushScreen('Milestone#2.html','Milestone#2');
+                  bb.pushScreen('main.html', 'main');
+              }, false);
+		}, false);
+		
+		
+dbNamespace = {};
+dbNamespace.db = window.openDatabase('Contactsdatabase', '1.0', 'Contact Information', 5*1024*1024);
+
+var cid;
+var bbcontacts;
+var firstName;
+var lastName;
+var workPhone;
+var homePhone;
+var workEmail;
+var homeEmail;
+var Desc;
+var currentId;
+var currentImg;
+var currentIdTT;
+var jsonData = null;
+var currentCampusId;
+
+
+
+<!--MY Contacts-->
+
+function myContacts(){
+	bb.pushScreen('contacts.html', 'contacts');
+	//startApp();
+}
+
+function startApp(){
+ 	var db = dbNamespace.db;
+	db.transaction(
+		function(tx) {
+			//tx.executeSql('DROP TABLE IF EXISTS Contacts');
+        	tx.executeSql(
+				"CREATE TABLE IF NOT EXISTS Contacts (Contacts_id INTEGER PRIMARY KEY ASC, Desc TEXT, img TEXT)", 
+        		[], 
+        		function(trans, result) {
+           			// handle  the success
+            		//alert("Database created!");
+        		}, 
+        		function(trans, error) {
+            		// handle the error
+            		alert("Database creation error: " + error);
+        		}
+			);
+			
+			//timetable
+			tx.executeSql(
+				"CREATE TABLE IF NOT EXISTS Timetable (TT_id INTEGER PRIMARY KEY ASC)", 
+        		[], 
+        		function(trans, result) {
+           			// handle  the success
+            		//alert("TT created!");
+        		}, 
+        		function(trans, error) {
+            		// handle the error
+            		alert("TT creation error: " + error);
+        		}
+			);
+			
+		}
+	);
+}
+
+function doSaveBB() {
+	
+	if  (  ( ( document.getElementById("FN").value!="" ) && ( document.getElementById("LN").value!="") &&  ( document.getElementById("HWM").value!="") )
+	&& ( (document.getElementById("MP").value!="" ) || ( document.getElementById("HP").value!="") )
+	
+	&& ( (document.getElementById("WE").value!="" ) || ( document.getElementById("HE").value!="") )
+	)
+	{
+		//alert("dosaveBB");
+		var contacts = blackberry.pim.contacts,
+		ContactField = contacts.ContactField,
+		name = {},
+		homePhone = { type: ContactField.HOME, value: document.getElementById("HP").value },
+		workPhone = { type: ContactField.WORK, value: document.getElementById("MP").value },
+		workEmail = { type: ContactField.WORK, value: document.getElementById("WE").value },
+		homeEmail = { type: ContactField.HOME, value: document.getElementById("HE").value },
+		contact;
+		name.familyName = document.getElementById("LN").value;
+		name.givenName = document.getElementById("FN").value;
+		contact = contacts.create({
+		"displayName": document.getElementById("FN").value + document.getElementById("LN").value ,
+		"name": name,
+		"phoneNumbers": [workPhone,homePhone],
+		"emails": [workEmail, homeEmail]
+		});
+		contact.save(onSaveSuccess, onSaveError);
+		
+	}
+	else {
+		
+	alert("fill");	
+	}
+}
+
+function onSaveSuccess(contact) {
+	//alert("Contact with id=" + contact.id + " is saved!");
+ 
+	cid=contact.id;
+	doSave(cid);
+}
+
+function onSaveError(error) {
+ alert("Error saving contact: " + error.code);
+}
+
+function doSave(id) {
+    var db = dbNamespace.db;
+	//alert("good");
+	var Desc = document.getElementsByName('HWM')[0].value;
+	//alert(Desc.length);
+	if(Desc&&Desc.length>0){
+		db.transaction(	
+			function(tx) {
+				tx.executeSql(
+					"INSERT INTO Contacts(Contacts_id,Desc) VALUES (?,?)",
+					[id,Desc],
+					function(trans, result) {
+						// handle the success
+						//alert("Contact added: " + id);
+						selectContactsFromBB();
+						document.getElementById('FN').value = " ";
+						document.getElementById('LN').value = " ";
+						document.getElementById('MP').value = " ";
+						document.getElementById('HP').value = " ";
+						document.getElementById('WE').value = " ";
+						document.getElementById('HE').value = " ";
+						document.getElementById('HWM').value = " ";
+						
+					}, 
+					function(trans, error) {
+						 // handle the error
+						 alert("Error adding " + id + ": " + error);
+					})
+			});
+	}
+}
+
+function selectContactsFromBB(){
+	fields = ['id', 'name', 'nickname'];
+	
+	success = function(contacts){
+		//alert(contacts[0].name.familyName);
+		//bbcontacts=contacts;
+		selectContacts(contacts);
+	};
+	error = function(error){};
+	findOptions = new blackberry.pim.contacts.ContactFindOptions();
+	blackberry.pim.contacts.find( fields, findOptions, success, error );
+}
+
+function selectContacts(contacts) {
+    var db = dbNamespace.db;
+	//alert("cont ln"+contacts.length+ "co"+contacts);
+	
+    db.transaction(function(tx) {
+        tx.executeSql("SELECT * FROM Contacts",
+        [],
+        function(trans, result) {
+			var rowOutput ="";
+			var items = [], item;
+			var pos=0;
+			
+            for(var i=0; i < result.rows.length; i++) {
+				var exist = false;
+				
+				for(var j=0;j<contacts.length; j++){
+					//alert("db id"+result.rows.item(i).Contacts_id + "co id "+ contacts[j].id);
+					if(parseInt(result.rows.item(i).Contacts_id)==parseInt(contacts[j].id)){
+						exist = true;
+						pos=j;
+						break;
+						}
+				}
+				
+				
+				
+				
+				if(exist == true){
+					//alert("in true");				
+					item = document.createElement('div');
+					item.setAttribute('data-bb-type','item');
+					item.setAttribute('data-id',result.rows.item(i).Contacts_id);
+					item.setAttribute('data-desc',result.rows.item(i).Desc);
+					item.setAttribute('data-img',result.rows.item(i).img);
+					item.setAttribute('data-bb-title', contacts[pos].name.givenName);
+					item.innerHTML = result.rows.item(i).Desc;
+					item.onclick = function() {
+						//alert(result.rows.item(i).Contacts_id);
+						var DL = document.getElementById("itemList").selected;
+						//alert(" id in on click"+ DL.getAttribute('data-id'));
+						currentId = DL.getAttribute('data-id');
+						currentImg = DL.getAttribute('data-img');
+						getID(DL.getAttribute('data-id'));
+						Desc = DL.getAttribute('data-desc');
+						bb.pushScreen('detailPage.html', 'detailPage');
+					
+						
+					};
+					items.push(item);
+				}else{
+				//alert("flaase"+ result.rows.item(i).Contacts_id);
+				deleteDB(parseInt( result.rows.item(i).Contacts_id ));
+				}
+			   /*rowOutput += result.rows.item(i).Desc;
+                rowOutput += " ";
+				var ul = document.querySelector("#itemList");
+				var li = document.createElement("li");
+				ul.appendChild(li);
+				li.innerText=rowOutput;*/
+            }
+			document.getElementById('itemList').refresh(items);
+            //alert( rowOutput );
+        }, 
+        function(trans, error) {
+        })
+    });
+}
+
+function deleteDB(id){
+	var db = dbNamespace.db;
+	db.transaction(	
+			function(tx) {
+				tx.executeSql(
+					"DELETE FROM Contacts WHERE Contacts_id = " + id,
+					[],
+					function(trans, result) {
+						// handle the success
+						alert("Contact deleted: " + id);
+					}, 
+					function(trans, error) {
+						 // handle the error
+						 alert("Error deleting " + id + ": " + error);
+					})
+			});
+}
+
+function getID(id){
+
+	var contacts = blackberry.pim.contacts;
+	var thisContact = contacts.getContact(id);
+	
+		firstName = thisContact.name.givenName;
+		lastName = thisContact.name.familyName;
+		workPhone= " ";
+		 homePhone = " ";
+		 workEmail = " ";
+		 homeEmail = " ";
+		
+		if(typeof (thisContact.phoneNumbers[0]) != "undefined") {
+			if (thisContact.phoneNumbers[0].type == 'work'){
+				workPhone = thisContact.phoneNumbers[0].value;
+			}else if (thisContact.phoneNumbers[0].type== 'home') {
+					homePhone = thisContact.phoneNumbers[0].value;
+			}
+			
+		}
+		
+		
+		if(typeof (thisContact.phoneNumbers[1]) != "undefined") {
+			if (thisContact.phoneNumbers[1].type == 'home'){
+				homePhone = thisContact.phoneNumbers[1].value;
+			}else if (thisContact.phoneNumbers[1].type== 'work') {
+					workPhone = thisContact.phoneNumbers[1].value;
+			}
+			
+		}
+		
+		if(typeof (thisContact.emails[0]) != "undefined") {
+			if (thisContact.emails[0].type == 'work'){
+				workEmail = thisContact.emails[0].value;
+			}else if (thisContact.emails[0].type== 'home') {
+					homeEmail = thisContact.emails[0].value;
+			}
+		}
+		if(typeof (thisContact.emails[1]) != "undefined") {
+			if (thisContact.emails[1].type == 'home'){
+				homeEmail = thisContact.emails[1].value;
+			}else if (thisContact.emails[1].type== 'work') {
+					workEmail = thisContact.emails[1].value;
+			}
+		}
+}
+
+
+
+
+
+
+<!--Going Places-->
+
+		function goingPlace(){
+			//alert('dd');
+			blackberry.invoke.invoke({
+			uri: "http://www.octranspo.com/mobi/"
+			}, onSuccess, onError);	
+		};
+		
+		function onSuccess(response) {
+			console.log("<p>Invocation query successful: " + response + "</p>");
+		}
+		
+		function onError(error) {
+			console.log("<p>Invocation query error: " + error + "</p>");
+		}
+		
+<!--Favorite Place-->
+		
+		function favoritePlace(){
+		
+			  var options;
+
+	  		navigator.geolocation.getCurrentPosition(geoSuccess, geoFail, options);
+				//alert("caca");
+		}
+	
+		// geolocation success callback
+		function geoSuccess(position) {
+			  var gpsPosition = position;
+			  var coordinates = gpsPosition.coords;
+			  myLat = coordinates.latitude;
+			  myLong = coordinates.longitude;
+				
+			  bb.pushScreen('google.html', 'google');
+		}
+	
+		// geolocation failure callback
+		function geoFail() {
+	  		alert('Error getting your position. Using defaults instead');
+	
+			  // set default position upon failure
+			  myLat = 45.348477;
+			  myLong = -75.754874;
+			  bb.pushScreen('google.html', 'google');
+		}
+	
+		function initGoogleMaps() {
+	
+		 
+
+	  		myLocation = new google.maps.LatLng(myLat, myLong);
+	       alert('in googgle map'+myLat+ " "+ myLong);
+	
+	  			var mapOptions = {
+				zoom: 14,
+				center: myLocation,
+				mapTypeId: google.maps.MapTypeId.ROADMAP,
+				zoomControl: false,
+				mapTypeControl: false,
+				streetViewControl: false
+	
+	 			};
+	
+	  
+		  googleMap = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+		
+		  var home = new google.maps.Marker({
+			map: googleMap,
+			position: myLocation
+		  });
+	
+		}
+	
+		// search for nearby places
+		function initGooglePlaces( value ) {
+	
+			  var request = {
+				location: myLocation,
+				radius: 2000,
+				types: [value]
+	  		};
+	
+		  var service = new google.maps.places.PlacesService(googleMap);
+		  service.search(request, function(results) {
+			
+			for(var i = 0; i < results.length; i++) {
+			  var marker = new google.maps.Marker({
+				map: googleMap,
+				position: results[i].geometry.location
+					
+				  });
+				}  
+			  });
+	 		return;
+		}
+		
+<!--		camera-->
+
+function takeC(){
+	var Photo = blackberry.invoke.card.CAMERA_MODE_PHOTO;
+	blackberry.invoke.card.invokeCamera(Photo, function (img){
+		document.getElementById("img").src = "file://" + img;	
+		//alert(img);
+		updateImg(img);
+	},
+	function(meg){
+		alert("Cancel reason" + meg );	
+	},
+	function(error){
+		if (error){
+		alert("Error!" + error );	
+		}
+	});
+}
+
+function updateImg(img){
+	var db = dbNamespace.db;
+	db.transaction(	
+			function(tx) {
+				tx.executeSql(
+					"UPDATE Contacts SET img = ? WHERE Contacts_id = ?",[img,currentId]
+					,
+					function(trans, result) {
+						// handle the success
+						alert("Update img: " + currentId);
+					}, 
+					function(trans, error) {
+						 // handle the error
+						 alert("Error updating " + currentId + ": " + error);
+					})
+			});
+}
+
+<!--my timetable-->
+function myTimetable(){
+	bb.pushScreen('timetable.html', 'timetable');
+}
+
+function doSaveBBTT() {
+	
+		var today = new Date();
+		var newdate = new Date();
+		
+		var day;
+		if (document.querySelector('#week').selectedOptions[0].value>today.getDay()){
+			
+			day = eval(document.querySelector('#week').selectedOptions[0].value)-today.getDay();
+			//alert("biggrt");
+		
+		}else{
+			
+			day = (today.getDay()+eval(document.querySelector('#week').selectedOptions[0].value))-3;
+			//alert("smaller");
+		}
+		newdate.setDate(today.getDate() + day);
+		var startDate = new Date(newdate.getFullYear(), newdate.getMonth(), newdate.getDate(), 
+		eval(document.querySelector('#time').selectedOptions[0].value), 0, 0,0);
+		//alert("start"+startDate);
+		
+		var endDate = new Date(newdate.getFullYear(), newdate.getMonth(), newdate.getDate(), 
+eval(document.querySelector('#time').selectedOptions[0].value)+eval(document.querySelector('#hour').selectedOptions[0].value), 0, 0,0);
+		//alert("end"+endDate);
+		
+		
+		var event = blackberry.pim.calendar.createEvent({
+			'summary': document.getElementById("con").value,
+			'location': document.getElementById("clan").value,
+			'start': startDate,
+			'end': endDate,
+			'description': document.getElementById("swi").getChecked()?'lab':'nolab'
+		});
+		
+		event.save(
+			function (e){
+				//alert('saved'+e.id);
+					
+				doSaveTT(e.id);
+				
+				
+				
+			}
+		);
+}
+
+function doSaveTT(id) {
+    var db = dbNamespace.db;
+	
+		db.transaction(	
+			function(tx) {
+				tx.executeSql(
+					"INSERT INTO Timetable(TT_id) VALUES (?)",
+					[id],
+					function(trans, result) {
+						// handle the success
+						
+						alert("add to DB");
+						selectTimetableFromBB();
+						
+					}, 
+					function(trans, error) {
+						 // handle the error
+						 alert("Error adding to DB" + id + ": " + error);
+					})
+			});
+	
+}
+
+function selectTimetableFromBB(){
+	
+	var options = {};
+	
+	blackberry.pim.calendar.findEvents(
+		options,
+		function(events){
+		
+			selectTimetable(events);
+			},
+			function(err){
+				alert('Error:' + error.code);	
+			}
+	);
+}
+
+function selectTimetable(events) {
+    var db = dbNamespace.db;
+	
+    db.transaction(function(tx) {
+        tx.executeSql("SELECT * FROM Timetable",
+        [],
+        function(trans, result) {
+			var rowOutput ="";
+			var items = [], item;
+			var pos=0;
+			//alert("length"+events.length);
+            for(var i=0; i < result.rows.length; i++) {
+				var exist = false;
+				for(var j=0;j<events.length; j++){
+					if(parseInt(result.rows.item(i).TT_id)==parseInt(events[j].id)){
+						exist = true;
+						pos=j;
+						break;
+						}
+				}
+				
+				
+				
+				
+				if(exist == true){
+								
+					item = document.createElement('div');
+					item.setAttribute('data-bb-type','item');
+					item.setAttribute('data-id',result.rows.item(i).TT_id);
+					//item.setAttribute('data-desc',result.rows.item(i).Desc);
+					//item.setAttribute('data-img',result.rows.item(i).img);
+					item.setAttribute('data-bb-title',events[pos].summary);
+					item.innerHTML = events[pos].start + "<br/>" + events[pos].end + "<br/>" + events[pos].description + "<br>" + events[pos].location;
+					item.setAttribute('style', 'font-size:32px; font-weight:bold; word-wrap: break-word;height:300px');
+					item.onclick = function() {
+					var DL = document.getElementById("timetableList").selected;
+					currentIdTT = DL.getAttribute('data-id');
+					bb.pushScreen('dTT.html', 'dTT');
+					
+						
+					};
+					items.push(item);
+				}else{
+				
+				deleteDBTT(parseInt( result.rows.item(i).TT_id ));
+				}
+            }
+			document.getElementById('timetableList').refresh(items);
+        }, 
+        function(trans, error) {
+        })
+    });
+}
+
+function DeleteTT(id){
+	var db = dbNamespace.db;
+	db.transaction(	
+			function(tx) {
+				tx.executeSql(
+					"DELETE FROM Timetable WHERE TT_id = " + id,
+					[],
+					function(trans, result) {
+						// handle the success
+						alert("Timetable deleted: " + id);
+					}, 
+					function(trans, error) {
+						 // handle the error
+						 alert("Error TT deleting " + id + ": " + error);
+					})
+			});
+}
+
+function getIDTT(id){
+	var evts = blackberry.pim.calendar;
+	var evt = evts.getEvent(id.toSrting(), evts.getDefaultCalendarFolder());
+	if(evt){
+		alert(evt);
+	}else{
+		alert("mmm");
+	}
+			
+}
+
+function doUpdateBBTT(){
+	
+	
+var evts = blackberry.pim.calendar;
+	var evt = evts.getEvent(currentIdTT.toSrting(), evts.getDefaultCalendarFolder());
+	if (evt){
+			var today = new Date();
+			var newdate = new Date();
+			
+			var day;
+			if (document.querySelector('#dweek').selectedOptions[0].value>today.getDay()){
+				
+				day = eval(document.querySelector('#dweek').selectedOptions[0].value)-today.getDay();
+			
+			
+			}else{
+				
+				day = (today.getDay()+eval(document.querySelector('#dweek').selectedOptions[0].value))-3;
+	
+			}
+			newdate.setDate(today.getDate() + day);
+			
+			var startDate = new Date(newdate.getFullYear(), newdate.getMonth(), newdate.getDate(), 
+			eval(document.querySelector('#dtime').selectedOptions[0].value), 0, 0,0);
+	
+			var endDate = new Date(newdate.getFullYear(), newdate.getMonth(), newdate.getDate(), 
+	eval(document.querySelector('#dtime').selectedOptions[0].value)+eval(document.querySelector('#dhour').selectedOptions[0].value), 0, 0,0);
+			
+		evt.start = startDate;
+		evt.end =endDate;
+		evt.location = document.getElementById("dclan").value;
+		evt.summary = 	document.getElementById("dclan").value;
+		event.save(
+			function (e){
+				alert('saved'+e.id);
+		});
+	}
+	
+	
+}
+
+<!--CampusService-->
+
+function CampusService(){
+		bb.pushScreen('M6.html', 'M6');
+
+}
+
+function dataGet(){
+	alert("get");
+	if(jsonData == null){
+		$.getJSON("Menu.json",good).fail(bad);
+		alert("get$");
+	}
+}
+
+function good(xhrData, status, jqXHR){
+	jsonData = xhrData;
+	var items=[];
+	var item;
+	for(var i=0; i<jsonData.services.length; i++){
+					item = document.createElement('div');
+					item.setAttribute('data-bb-type','item');
+					//item.setAttribute('data-id', i.toString());
+					item.setAttribute('data-bb-title', jsonData.services[i].title);
+					item.onclick = function() {
+						var DL = document.getElementById("MitemList").selected;
+						currentCampusId = DL.getAttribute('data-id');
+						bb.pushScreen('dm6.html', 'dm6');
+					
+						
+					};
+					items.push(item);
+}
+	document.getElementById('MitemList').refresh(items);
+}
+
+function bad(jqXHR, textStatus, errorThrown){
+	alert(errorThrown);
+}
+
+</script>
+
+</head>
+
+<body>
+</body>
+</html>

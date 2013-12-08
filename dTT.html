@@ -1,0 +1,53 @@
+<div data-bb-type="screen" data-bb-effect="slide-left" id="detailPageTT">
+	<div id="TitleBar" data-bb-type="title" data-bb-caption="Detail" data-bb-back-caption="Back"></div>
+    <div id="detailTT">
+    
+    	Course Name :<input type="text" name="co" id="dcon" />
+                	Classroom Number:<input type="text" name="cla" id="dclan" />
+                	
+                    <select id="dweek">
+                    	<option value="1">Mon</option>
+                        <option value="2">Tue</option>
+                        <option value="3">Wed</option>
+                        <option value="4">Thur</option>
+                        <option value="5">Fri</option>
+                        <option value="6">Sat</option>
+                        <option value="0">Sun</option>
+                    </select>
+                    
+                    <select id="dtime">
+                    	<option value="8">8:00</option>
+                        <option value="9">9:00</option>
+                        <option value="10">10:00</option>
+                        <option value="11">11:00</option>
+                        <option value="12">12:00</option>
+                        <option value="13">13:00</option>
+                        <option value="14">14:00</option>
+                    </select>
+                    
+                    <select id="dhour">
+                    	<option value="1">1h</option>
+                        <option value="2">2h</option>
+                        <option value="3">3h</option>
+                        <option value="4">4h</option>
+                    </select>
+                    
+                     <div id="dswi" data-bb-type="toggle" data-bb-checked="true" data-bb-on="Yes" data-bb-off="No" onchange="doSomething(this)"></div>
+                     
+                     <fieldset>
+                     	<legend>REMINDER</legend>
+                             <select id="dreminder">
+                                <option value="5">5min</option>
+                                <option value="10">10min</option>
+                                <option value="15">15minmin</option>
+                                <option value="20">20min</option>
+                            </select>
+                    
+                    <div id="dinswi" data-bb-type="toggle" data-bb-checked="true" data-bb-on="Yes" data-bb-off="No" onchange="doSomething(this)"></div>
+						</fieldset>
+                     
+                    <div data-bb-type="button" onclick="doUpdateBBTT();">Save To Calendar</div>
+                    <div data-bb-type="button" onclick="DeleteTT();">Delete</div>
+    </div>
+    
+</div>

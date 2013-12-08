@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<script id="actionBarJS" src="js/actionBar.js"></script>
+<title>Contacts</title>
+</head>
+
+<body>
+<div data-bb-type="screen" data-bb-effect="slide-left">
+	<div id="backTitleBar" data-bb-type="title" data-bb-caption="All Contacts" data-bb-back-caption="Back" ></div>
+    <!--<div id="addTitleBar" data-bb-type="title" data-bb-caption="Add A Contact" data-bb-back-caption="Cancel" data-bb-action-caption="Save" onactionclick="doSave()"></div>-->
+    
+    <div data-role="page" id="AllContacts">
+        <ul data-bb-type="image-list" data-bb-style="arrowlist" id="itemList"></ul>
+<!--        <input type="button" value="ggg" name="detailBtn" id="DBTN">
+-->        
+    </div>
+    
+ 	<div data-role="page" id="AddContact" hidden="">
+			<div data-bb-type="label-control-horizontal-row">
+<!--    			<form>
+--> 				First Name :<input type="text" name="FN" id="FN" />
+                	Last Name :<input type="text" name="LN" id="LN" />
+                	Mobile Phone :<input type="text" name="MP" id="MP" />
+                    Home Phone :<input type="text" name="HP" id="HP" />
+                    Work Email :<input type="text" name="SE" id="WE" />
+                    Home Email :<input type="text" name="PE" id="HE" />
+                    How We Met :<input type="text" name="HWM" id="HWM" />
+                    <div data-bb-type="button" onclick="doSaveBB();">Save</div>
+<!--                </form>
+-->       		</div>
+	</div>
+   
+    <div data-bb-type="action-bar">
+        <div data-bb-type="action" data-bb-style="tab" data-bb-selected="true" data-bb-img="bb10/images/actionBar/cog_dark_theme.png" onclick="showTab('AllContacts')">All Contacts</div>
+		<div data-bb-type="action" data-bb-style="tab" data-bb-img="bb10/images/actionBar/cog_dark_theme.png" data-bb-visible="true" onclick="showTab('AddContact')">New Contact</div>
+	</div>
+</div>
+
+	<div data-role="page" id="showContacts">
+    	<ul data-role="listview" id="itemContacts"></ul>
+    </div>
+	
+</body>
+</html>
+

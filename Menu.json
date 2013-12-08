@@ -1,0 +1,67 @@
+﻿{"services":[
+             
+             {
+			  "title":"Food and Beverage",
+			  "detail":
+				 [
+					  {"service":"Marketplace Food Court（Building D）"},
+					  {"service":"35th Street Market Café (Residence)"},
+					  {"service":"Bits N’ Bytes (Building T)"},
+					  {"service":"Thunder Alley (Building A)"},
+					  {"service":"The Portable Feast (Building B)"},
+					  {"service":"First Cup Deli (Building C)"},
+					  {"service":"The Observatory (Building A)"},
+					  {"service":"The Fix Eatery ACCE Building"}
+				 ]
+             },
+             {
+			  "title":"Health Services",
+			  "detail":
+				 [
+					  {"service":"Ottawa Campus (Building C)"}
+				 ]
+             },
+             {
+			  "title":"Gym",
+			  "detail":
+				 [
+				 	 {"service":"Algonquin Fitness Zone (Building A)"}
+				 ]
+             },
+             {
+			  "title":"Mail Services",
+			  "detail":
+				 [
+					  {"service":"Mail Services (Building A)"}
+				 ]
+             },
+             {
+			   "title":"Technology Store",
+			   "detail":
+				 [
+					  {"service":"Technology Store (Building D)"}
+				 ]
+             },
+             {
+				 "title":"Peer Tutoring",
+				 "detail":
+				 [
+					  {"service":"Peer Tutoring (Building E)"}
+				 ]
+             },
+             {
+				 "title":"Spriritual Centre",
+				 "detail":
+				 [
+					  {"service":"Spriritual Centre (Building E)"}
+				 ]
+             },
+             {
+			  "title":"Student Commons",
+			  "detail":
+				 [
+					  {"service":"Student Commons (Building E)"}
+				 ]
+             }
+      ]
+}
